@@ -20,7 +20,7 @@ const scrape = (ns, cb) => {
   console.log(`Scraping ${totalPages} pages of names in ${ns}`);
 
   for(var page = 0; page < totalPages; page++) {
-    pagePromises.push(getPageForNamespace(ns, page)
+    let pagePromise = getPageForNamespace(ns, page)
       .then((namesWrapper) => {
         if(namesWrapper.json) {
           names = namesWrapper.json;
@@ -34,11 +34,15 @@ const scrape = (ns, cb) => {
                 console.log(`Unexpected zonefile result for ${name}`);
               }
             });
-          });
+          })
 
           return Promise.all(promises);
         }
-      }))
+      }).catch((e) => {
+        console.log(`Error processing names on page ${page}`);
+      });
+
+    pagePromises.push(pagePromise);
   }
   return Promise.all(pagePromises).then(() => {
     console.log(`Successes: ${successCount}\nErrors: ${errorCount}`);
