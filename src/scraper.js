@@ -43,9 +43,6 @@ const scrape = (ns, cb) => {
   return Promise.all(pagePromises).then(() => {
     console.log(`Successes: ${successCount}\nErrors: ${errorCount}`);
   });
-
-  // console.log('Sending message');
-  // cb({testMsg: 'foo'});
 };
 
 module.exports = scrape;

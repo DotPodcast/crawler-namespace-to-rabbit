@@ -3,7 +3,7 @@ let { exec } = require('child_process');
 const runCommand = (...cmd) => {
   const builtCmd = `blockstack ${cmd.join(' ')}`
 
-  var p = new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     exec(builtCmd, (err, stdout, stderr) => {
       if (err) {
         console.error(`exec error: ${err}`);
@@ -18,8 +18,6 @@ const runCommand = (...cmd) => {
       }
     });
   });
-
-  return p;
 }
 
 module.exports = runCommand;
