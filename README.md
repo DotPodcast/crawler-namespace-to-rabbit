@@ -4,9 +4,9 @@ This is one component of the scraping architecture.
 
 Currently, this component:
 
-#. Gets pages of names within a namespace
-#. Gets the zonefile for each name
-#. Publishes the name+zonefile in a message to RabbitMQ.
+1. Gets pages of names within a namespace
+1. Gets the zonefile for each name
+1. Publishes the name+zonefile in a message to RabbitMQ.
 
 Any name that returns an unexpected zonefile (one not starting with
 `'$ORIGIN'`) is ignored. Any names that have fail to retrieve a zonefile
