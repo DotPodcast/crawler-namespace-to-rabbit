@@ -8,5 +8,8 @@
   "dependencies": {
     "amqplib": "^0.5.2",
     "nconf": "^0.9.1"
+  },
+  "scripts": {
+    "dev": "cd src/ && node app.js"
   }
 }
