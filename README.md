@@ -30,6 +30,9 @@ docker-compose up
 will do the trick. If you already have one running, ensure that the
 rabbit host and exchange are configured properly in `config.json`.
 
+Since multiple parts of this scraping system rely on RabbitMQ, I'd
+recommend spinning one up and pointing all projects to it.
+
 Run the app with:
 ```
 yarn run dev
