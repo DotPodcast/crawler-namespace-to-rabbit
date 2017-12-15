@@ -1,0 +1,12 @@
+{
+  "name": "namespace-to-rabbit",
+  "version": "0.0.1",
+  "description": "Crawl names in a namespace and output their basic details in a rabbit message",
+  "main": "app.js",
+  "author": "freethejazz",
+  "license": "MIT",
+  "dependencies": {
+    "amqplib": "^0.5.2",
+    "nconf": "^0.9.1"
+  }
+}

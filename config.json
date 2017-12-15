@@ -1,0 +1,13 @@
+{
+  "blockstack": {
+    "host": "localhost"
+  },
+  "rabbit": {
+    "host": "localhost",
+    "exchange": "names"
+  },
+  "scraper": {
+    "namespace": "id",
+    "pageLimit": 2
+  }
+}
