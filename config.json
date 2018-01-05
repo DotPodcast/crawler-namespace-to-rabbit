@@ -1,10 +1,11 @@
 {
   "blockstack": {
-    "host": "localhost"
+    "host": "localhost",
+    "corePath": "http://localhost:6264/RPC2"
   },
   "rabbit": {
     "host": "localhost",
-    "exchange": "names"
+    "queue": "names_queue"
   },
   "scraper": {
     "namespace": "id",

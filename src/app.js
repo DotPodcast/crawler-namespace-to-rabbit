@@ -1,7 +1,7 @@
 let nconf = require('nconf');
 let amqplib = require('amqplib');
 
-let scraper = require('./scraper.js');
+let getNames = require('./getNames.js');
 
 // Pull configuration
 nconf.argv()
@@ -9,7 +9,7 @@ nconf.argv()
   .file('../config.json');
 
 
-let ex = nconf.get('rabbit:exchange');
+let q= nconf.get('rabbit:queue');
 let ns = nconf.get('scraper:namespace');
 
 // Connect to RabbitMQ
@@ -17,15 +17,20 @@ let open = amqplib.connect(`amqp://${nconf.get('rabbit:host')}`);
 open.then((conn) => {
   conn.createChannel()
     .then((ch) => {
-      ch.assertExchange(ex, 'fanout', {durable: false});
-      console.log('Connected to Exchange');
+      ch.assertQueue(q, {durable: true});
+      console.log('Queue is Present');
 
       const publish = (obj) => {
-        ch.publish(ex, '', new Buffer(JSON.stringify(obj)));
+        console.log(obj);
+        ch.sendToQueue(q, new Buffer(JSON.stringify(obj)), {persistent: true});
       }
 
-      scraper(ns, publish).then(() => {
+      getNames(ns, publish, 1).then(() => {
         console.log('Done Scraping');
+        setTimeout(() => exit(), 1000);
+      }).catch((e) => {
+        console.log('Something went wrong')
+        console.log(e);
         exit();
       });
     });
