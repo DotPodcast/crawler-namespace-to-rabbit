@@ -1,28 +1,28 @@
-let runCommand = require('./makeBlockstackRequest');
-let blockstackd = require('./blockstackd');
+const runCommand = require('./makeBlockstackRequest');
+const blockstackd = require('./blockstackd');
 
-const PAGE_SIZE = 100
+const PAGE_SIZE = 100;
 
 const getNames = async (ns, cb, pageLimit) => {
   console.log('Getting Names');
 
   let successCount = 0;
   let errorCount = 0;
-  let pagePromises = [];
+  const pagePromises = [];
 
-  let totalNamesResponse = await blockstackd.getNumNamesInNamespace(ns);
-  if(totalNamesResponse.error) {
+  const totalNamesResponse = await blockstackd.getNumNamesInNamespace(ns);
+  if (totalNamesResponse.error) {
     return Promise.reject(totalNamesResponse.error);
   }
 
-  let totalNames = totalNamesResponse.count;
+  const totalNames = totalNamesResponse.count;
   console.log(`${totalNames} total names in the ${ns} namespace`);
 
-  maxPages = Math.ceil(totalNames/PAGE_SIZE);
+  maxPages = Math.ceil(totalNames / PAGE_SIZE);
 
-  if(!pageLimit) {
+  if (!pageLimit) {
     // No limit, get them all
-    pageLimit = Math.ceil(totalNames/PAGE_SIZE);
+    pageLimit = Math.ceil(totalNames / PAGE_SIZE);
   } else {
     // Limit set, but don't let the limit exceed the actual number of pages available
     pageLimit = Math.min(pageLimit, maxPages);
@@ -30,14 +30,14 @@ const getNames = async (ns, cb, pageLimit) => {
 
   console.log(`Scraping ${pageLimit} pages of names in ${ns}`);
 
-  for(let currentPage = 0; currentPage < pageLimit; currentPage++) {
-    let pagePromise = blockstackd.getNamesInNamespace(ns, currentPage * PAGE_SIZE, PAGE_SIZE)
+  for (let currentPage = 0; currentPage < pageLimit; currentPage++) {
+    const pagePromise = blockstackd.getNamesInNamespace(ns, currentPage * PAGE_SIZE, PAGE_SIZE)
       .then((namesWrapper) => {
-        if(namesWrapper.names) {
+        if (namesWrapper.names) {
           names = namesWrapper.names;
           successCount += names.length;
           names.forEach((name) => {
-            cb({name});
+            cb({ name });
           });
         } else if (namesWrapper.error) {
           errorCount += PAGE_SIZE;

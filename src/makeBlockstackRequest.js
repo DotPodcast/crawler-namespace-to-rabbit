@@ -1,7 +1,7 @@
-let { exec } = require('child_process');
+const { exec } = require('child_process');
 
 const runCommand = (...cmd) => {
-  const builtCmd = `blockstack ${cmd.join(' ')}`
+  const builtCmd = `blockstack ${cmd.join(' ')}`;
 
   return new Promise((resolve, reject) => {
     exec(builtCmd, (err, stdout, stderr) => {
@@ -12,12 +12,12 @@ const runCommand = (...cmd) => {
 
       try {
         const msg = JSON.parse(stdout.trim());
-        resolve({json: msg});
-      } catch(e) {
-        resolve({txt: stdout.trim()});
+        resolve({ json: msg });
+      } catch (e) {
+        resolve({ txt: stdout.trim() });
       }
     });
   });
-}
+};
 
 module.exports = runCommand;

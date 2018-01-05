@@ -1,7 +1,7 @@
-let nconf = require('nconf');
-let amqplib = require('amqplib');
+const nconf = require('nconf');
+const amqplib = require('amqplib');
 
-let getNames = require('./getNames.js');
+const getNames = require('./getNames.js');
 
 // Pull configuration
 nconf.argv()
@@ -9,31 +9,31 @@ nconf.argv()
   .file('config.json');
 
 
-let q= nconf.get('rabbit:queue');
-let ns = nconf.get('scraper:namespace');
+const q = nconf.get('rabbit:queue');
+const ns = nconf.get('scraper:namespace');
 
 
 console.log(nconf.get('rabbit'));
 console.log(nconf.get('scraper'));
 
 // Connect to RabbitMQ
-let open = amqplib.connect(`amqp://${nconf.get('rabbit:host')}`);
+const open = amqplib.connect(`amqp://${nconf.get('rabbit:host')}`);
 open.then((conn) => {
   conn.createChannel()
     .then((ch) => {
-      ch.assertQueue(q, {durable: true});
+      ch.assertQueue(q, { durable: true });
       console.log('Queue is Present');
 
       const publish = (obj) => {
         console.log(obj);
-        ch.sendToQueue(q, new Buffer(JSON.stringify(obj)), {persistent: true});
-      }
+        ch.sendToQueue(q, new Buffer(JSON.stringify(obj)), { persistent: true });
+      };
 
       getNames(ns, publish, 1).then(() => {
         console.log('Done Scraping');
         setTimeout(() => exit(), 1000);
       }).catch((e) => {
-        console.log('Something went wrong')
+        console.log('Something went wrong');
         console.log(e);
         exit();
       });
@@ -49,7 +49,7 @@ const exit = () => {
   process.exit(0);
 };
 
-process.on( 'SIGINT', function() {
-  console.log( "\nGracefully shutting down from SIGINT (Ctrl-C)" );
+process.on('SIGINT', () => {
+  console.log('\nGracefully shutting down from SIGINT (Ctrl-C)');
   exit();
 });
