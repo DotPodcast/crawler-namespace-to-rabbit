@@ -6,11 +6,15 @@ let getNames = require('./getNames.js');
 // Pull configuration
 nconf.argv()
   .env()
-  .file('../config.json');
+  .file('config.json');
 
 
 let q= nconf.get('rabbit:queue');
 let ns = nconf.get('scraper:namespace');
+
+
+console.log(nconf.get('rabbit'));
+console.log(nconf.get('scraper'));
 
 // Connect to RabbitMQ
 let open = amqplib.connect(`amqp://${nconf.get('rabbit:host')}`);

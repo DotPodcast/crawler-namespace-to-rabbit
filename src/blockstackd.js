@@ -4,7 +4,7 @@ let { exec } = require('child_process');
 // Pull configuration
 nconf.argv()
   .env()
-  .file('../config.json');
+  .file('config.json');
 
 const CORE_PATH = nconf.get('blockstack:corePath');
 

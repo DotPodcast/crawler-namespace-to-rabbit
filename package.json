@@ -10,6 +10,21 @@
     "nconf": "^0.9.1"
   },
   "scripts": {
-    "dev": "cd src/ && node app.js"
+    "lint": "eslint .",
+    "start": "nodemon src/app.js --exec 'yarn lint; babel-node'",
+    "build": "babel src -d dist",
+    "serve": "node dist/app.js",
+    "test": "mocha -r chai/register-expect --compilers js:babel-register"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-airbnb": "^2.4.0",
+    "babel-register": "^6.26.0",
+    "chai": "^4.1.2",
+    "eslint": "^4.14.0",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.7.0",
+    "mocha": "^4.1.0",
+    "nodemon": "^1.14.7"
   }
 }
