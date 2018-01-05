@@ -1,3 +1,4 @@
+const winston = require('winston');
 const nconf = require('nconf');
 const { exec } = require('child_process');
 
@@ -13,10 +14,10 @@ const CORE_PATH = nconf.get('blockstack:corePath');
 const runCommand = (...cmd) => {
   const builtCmd = `blockstackd-cli -n ${CORE_PATH} ${cmd.join(' ')}`;
 
-  return new Promise((resolve, reject) => {
-    exec(builtCmd, (err, stdout, stderr) => {
+  return new Promise((resolve) => {
+    exec(builtCmd, (err, stdout) => {
       if (err) {
-        console.error(`exec error: ${err}`);
+        winston.log('error', `exec error: ${err}`);
         return;
       }
 
@@ -24,7 +25,7 @@ const runCommand = (...cmd) => {
         const result = JSON.parse(stdout.trim());
         resolve(result);
       } catch (e) {
-        console.log(e);
+        winston.log('error', e);
         resolve({ error: 'Failed to run command. Check the logs for more detail.' });
       }
     });

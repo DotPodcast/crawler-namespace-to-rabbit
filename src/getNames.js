@@ -1,10 +1,10 @@
-const runCommand = require('./makeBlockstackRequest');
+const winston = require('winston');
 const blockstackd = require('./blockstackd');
 
 const PAGE_SIZE = 100;
 
 const getNames = async (ns, cb, pageLimit) => {
-  console.log('Getting Names');
+  winston.log('info', 'Getting Names');
 
   let successCount = 0;
   let errorCount = 0;
@@ -16,42 +16,46 @@ const getNames = async (ns, cb, pageLimit) => {
   }
 
   const totalNames = totalNamesResponse.count;
-  console.log(`${totalNames} total names in the ${ns} namespace`);
+  winston.log('info', `${totalNames} total names in the ${ns} namespace`);
 
-  maxPages = Math.ceil(totalNames / PAGE_SIZE);
+  const maxPages = Math.ceil(totalNames / PAGE_SIZE);
+
+  let actualPageLimit = pageLimit;
 
   if (!pageLimit) {
     // No limit, get them all
-    pageLimit = Math.ceil(totalNames / PAGE_SIZE);
+    actualPageLimit = Math.ceil(totalNames / PAGE_SIZE);
   } else {
     // Limit set, but don't let the limit exceed the actual number of pages available
-    pageLimit = Math.min(pageLimit, maxPages);
+    actualPageLimit = Math.min(pageLimit, maxPages);
   }
 
-  console.log(`Scraping ${pageLimit} pages of names in ${ns}`);
+  winston.log('info', `Scraping ${actualPageLimit} pages of names in ${ns}`);
 
-  for (let currentPage = 0; currentPage < pageLimit; currentPage++) {
+  const handleNamesCall = (namesWrapper) => {
+    if (namesWrapper.names) {
+      const { names } = namesWrapper;
+      successCount += names.length;
+      names.forEach((name) => {
+        cb({ name });
+      });
+    } else if (namesWrapper.error) {
+      errorCount += PAGE_SIZE;
+    }
+  };
+
+  for (let currentPage = 0; currentPage < actualPageLimit; currentPage += 1) {
     const pagePromise = blockstackd.getNamesInNamespace(ns, currentPage * PAGE_SIZE, PAGE_SIZE)
-      .then((namesWrapper) => {
-        if (namesWrapper.names) {
-          names = namesWrapper.names;
-          successCount += names.length;
-          names.forEach((name) => {
-            cb({ name });
-          });
-        } else if (namesWrapper.error) {
-          errorCount += PAGE_SIZE;
-        }
-      }).catch((e) => {
-        console.log(e);
-        console.log('Error processing names on page');
+      .then(handleNamesCall).catch((e) => {
+        winston.log('info', e);
+        winston.log('info', 'Error processing names on page');
       });
 
     pagePromises.push(pagePromise);
   }
 
   return Promise.all(pagePromises).then(() => {
-    console.log(`Successes: ${successCount}\nErrors: ${errorCount}`);
+    winston.log('info', `Successes: ${successCount}\nErrors: ${errorCount}`);
   });
 };
 
