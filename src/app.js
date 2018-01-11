@@ -1,8 +1,10 @@
-const winston = require('winston');
-const nconf = require('nconf');
-const amqplib = require('amqplib');
+import winston from 'winston';
+import nconf from 'nconf';
+import amqplib from 'amqplib';
 
-const getNames = require('./getNames.js');
+import getNames from './getNames.js';
+import config from './config';
+
 
 const exit = () => {
   process.exit(0);
@@ -14,39 +16,54 @@ nconf.argv()
   .file('config.json');
 
 
-const q = nconf.get('rabbit:queue');
-const ns = nconf.get('scraper:namespace');
+const inQ = config.get('rabbit:inQueue');
+const outQ = config.get('rabbit:outQueue');
 
-
-winston.log('info', nconf.get('rabbit'));
-winston.log('info', nconf.get('scraper'));
+winston.log('info', config.get('rabbit'));
+winston.log('info', config.get('scraper'));
 
 // Connect to RabbitMQ
-const open = amqplib.connect(`amqp://${nconf.get('rabbit:host')}`);
+const open = amqplib.connect(`amqp://${config.get('rabbit:host')}`);
 open.then((conn) => {
   conn.createChannel()
     .then((ch) => {
-      ch.assertQueue(q, { durable: true });
-      winston.log('info', 'Queue is Present');
+      ch.assertQueue(inQ, { durable: true });
+      winston.log('info', 'Input queue is Present');
+
+      ch.assertQueue(outQ, { durable: true });
+      winston.log('info', 'Output queue is Present');
 
       const publish = (obj) => {
         winston.log('info', obj);
-        ch.sendToQueue(q, Buffer.from(JSON.stringify(obj)), { persistent: true });
+        ch.sendToQueue(outQ, Buffer.from(JSON.stringify(obj)), { persistent: true });
       };
 
-      getNames(ns, publish, 1).then(() => {
-        winston.log('info', 'Done Scraping');
-        setTimeout(() => exit(), 1000);
-      }).catch((e) => {
-        winston.log('info', 'Something went wrong');
-        winston.log('info', e);
-        exit();
-      });
+      const work = (doc, channel, msg) => {
+        getNames(doc.namespace, publish, 1).then(() => {
+          winston.log('info', 'Done Scraping');
+          return channel.ack(msg);
+        }).catch((e) => {
+          winston.log('info', 'Something went wrong');
+          winston.log('info', e);
+          return channel.nack(msg, undefined, false);
+        });
+      };
+
+      ch.consume(inQ, (msg) => {
+        let doc;
+        try {
+          doc = JSON.parse(msg.content.toString());
+        } catch (e) {
+          winston.log('error', e);
+          return winston.log('error', 'Could not parse message into JSON');
+        }
+        return work(doc, ch, msg);
+      }, { noAck: false });
     });
 });
 
 open.catch((err) => {
-  winston.log('warn', `Error connecting to rabbit at ${nconf.get('rabbit_host')}`);
+  winston.log('warn', `Error connecting to rabbit at ${config.get('rabbit_host')}`);
   winston.log('error', err);
   process.exit(1);
 });

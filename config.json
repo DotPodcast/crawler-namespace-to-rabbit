@@ -5,10 +5,7 @@
   },
   "rabbit": {
     "host": "localhost",
-    "queue": "name_queue"
-  },
-  "scraper": {
-    "namespace": "id",
-    "pageLimit": 2
+    "inQueue": "namespace_crawl_queue",
+    "outQueue": "name_queue"
   }
 }
