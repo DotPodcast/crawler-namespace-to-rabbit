@@ -5,12 +5,10 @@ This is one component of the scraping architecture.
 Currently, this component:
 
 1. Gets pages of names within a namespace
-1. Gets the zonefile for each name
-1. Publishes the name+zonefile in a message to RabbitMQ.
+2. Publishes the list of names to RabbitMQ
 
 Any name that returns an unexpected zonefile (one not starting with
-`'$ORIGIN'`) is ignored. Any names that have fail to retrieve a zonefile
-are ignored.
+`'$ORIGIN'`) is ignored.
 
 ### Setup
 Install app dependencies with:
