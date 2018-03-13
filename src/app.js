@@ -30,7 +30,7 @@ open.then((conn) => {
       ch.assertQueue(inQ, { durable: true });
       winston.log('info', 'Input queue is Present');
 
-      ch.assertQueue(outQ, { durable: true });
+      ch.assertQueue(outQ, { maxLength: 40000, durable: true });
       winston.log('info', 'Output queue is Present');
 
       const publish = (obj) => {
@@ -39,7 +39,7 @@ open.then((conn) => {
       };
 
       const work = (doc, channel, msg) => {
-        getNames(doc.namespace, publish, 1).then(() => {
+        getNames(doc.namespace, publish).then(() => {
           winston.log('info', 'Done Scraping');
           return channel.ack(msg);
         }).catch((e) => {

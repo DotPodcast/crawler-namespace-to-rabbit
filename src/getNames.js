@@ -8,7 +8,6 @@ const getNames = async (ns, cb, pageLimit) => {
 
   let successCount = 0;
   let errorCount = 0;
-  const pagePromises = [];
 
   const totalNamesResponse = await blockstackd.getNumNamesInNamespace(ns);
   if (totalNamesResponse.error) {
@@ -45,18 +44,17 @@ const getNames = async (ns, cb, pageLimit) => {
   };
 
   for (let currentPage = 0; currentPage < actualPageLimit; currentPage += 1) {
-    const pagePromise = blockstackd.getNamesInNamespace(ns, currentPage * PAGE_SIZE, PAGE_SIZE)
-      .then(handleNamesCall).catch((e) => {
-        winston.log('info', e);
-        winston.log('info', 'Error processing names on page');
-      });
-
-    pagePromises.push(pagePromise);
+    try {
+      winston.info(`Fetching page ${currentPage + 1}`);
+      const namesWrapper = await blockstackd.getNamesInNamespace(ns, currentPage * PAGE_SIZE, PAGE_SIZE);
+      handleNamesCall(namesWrapper);
+    } catch (e) {
+      winston.log('info', e);
+      winston.log('info', 'Error processing names on page');
+    }
   }
 
-  return Promise.all(pagePromises).then(() => {
-    winston.log('info', `Successes: ${successCount}\nErrors: ${errorCount}`);
-  });
+  return winston.log('info', `Successes: ${successCount}\nErrors: ${errorCount}`);
 };
 
 module.exports = getNames;

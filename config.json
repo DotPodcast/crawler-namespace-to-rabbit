@@ -1,7 +1,7 @@
 {
   "blockstack": {
     "host": "localhost",
-    "corePath": "http://localhost:6265/RPC2"
+    "corePath": "http://node.blockstack.org:6264/RPC2"
   },
   "rabbit": {
     "host": "localhost",
