@@ -1,0 +1,6 @@
+version: '2'
+services:
+  namespace-to-rabbit:
+    build: .
+    environment:
+      - NODE_ENV=production
