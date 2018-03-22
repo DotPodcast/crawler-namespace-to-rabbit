@@ -22,6 +22,11 @@ or
 npm install
 ```
 
+In addition to Node.js dependencies, you also need to make sure
+`blockstackd-cli` is installed and available on your path. See
+[https://github.com/blockstack/blockstack.go/tree/master/cmd/blockstackd-cli](https://github.com/blockstack/blockstack.go/tree/master/cmd/blockstackd-cli)
+for more information.
+
 Then, make sure you have a RabbitMQ instance available:
 ```
 docker-compose up
