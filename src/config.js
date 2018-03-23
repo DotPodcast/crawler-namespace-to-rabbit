@@ -2,7 +2,7 @@ import nconf from 'nconf';
 
 // Pull in configuration
 nconf.argv()
-  .env()
+  .env({ separator: '_' })
   .file('config.json');
 
 export default nconf;

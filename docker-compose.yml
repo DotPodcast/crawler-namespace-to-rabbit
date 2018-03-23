@@ -4,3 +4,4 @@ services:
     build: .
     environment:
       - NODE_ENV=production
+      - rabbit_host=rabbit

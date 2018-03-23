@@ -1,5 +1,4 @@
 import winston from 'winston';
-import nconf from 'nconf';
 import amqplib from 'amqplib';
 
 import getNames from './getNames.js';
@@ -9,12 +8,6 @@ import config from './config';
 const exit = () => {
   process.exit(0);
 };
-
-// Pull configuration
-nconf.argv()
-  .env()
-  .file('config.json');
-
 
 const inQ = config.get('rabbit:inQueue');
 const outQ = config.get('rabbit:outQueue');
@@ -63,7 +56,7 @@ open.then((conn) => {
 });
 
 open.catch((err) => {
-  winston.log('warn', `Error connecting to rabbit at ${config.get('rabbit_host')}`);
+  winston.log('warn', `Error connecting to rabbit at ${config.get('rabbit:host')}`);
   winston.log('error', err);
   process.exit(1);
 });

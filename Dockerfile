@@ -1,5 +1,6 @@
 FROM node:8
 
+COPY blockstackd-cli /usr/local/bin
 RUN mkdir -p /home/node/app
 WORKDIR /home/node/app
 COPY package.json ./
